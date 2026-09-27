@@ -1,12 +1,14 @@
-    generator client {
- provider = "prisma-client-js"
+generator client {
+  provider = "prisma-client-js"
 }
-    datasource db {
- provider = "mysql"
+
+datasource db {
+  provider = "mysql"
 }
-    model Produtos{
- id Int @id @default(autoincrement())
- nome String @unique
- createdAt DateTime @default(now())
- updatedAt DateTime @updatedAt
+
+model Produtos {
+  id        Int      @id @default(autoincrement())
+  nome      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
