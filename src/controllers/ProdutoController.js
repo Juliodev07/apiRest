@@ -2,23 +2,53 @@ const ProdutoService = require("../services/ProdutosService");
 
 class ProdutoController {
   async create(request, response) {
-    const produto = await ProdutoService.create(request.body);
+    try {
+      const produto = await ProdutoService.create(request.body);
 
-    return response.status(201).json({ produto });
+      return response.status(201).json({ produto });
+    } catch (e) {
+      return response.status(e.statusCode || 500).json({
+        message: e.message
+      });
+    }
   }
 
   async findMany(request, response) {
-    const produtos = await ProdutoService.findMany();
+    try {
+      const {
+        page = 1,
+        pageSize = 10,
+        orderBy = "id",
+        order = "asc"
+      } = request.query;
 
-    return response.status(200).json({ produtos });
+      const resultado = await ProdutoService.findMany(
+        page,
+        pageSize,
+        orderBy,
+        order
+      );
+
+      return response.status(200).json(resultado);
+    } catch (e) {
+      return response.status(e.statusCode || 500).json({
+        message: e.message
+      });
+    }
   }
 
   async delete(request, response) {
-    const { id } = request.params;
+    try {
+      const { id } = request.params;
 
-    const produto = await ProdutoService.delete(id);
+      await ProdutoService.delete(id);
 
-    return response.status(204).json({ produto });
+      return response.status(204).send();
+    } catch (e) {
+      return response.status(e.statusCode || 500).json({
+        message: e.message
+      });
+    }
   }
 }
 
