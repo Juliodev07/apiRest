@@ -1,22 +1,23 @@
-const ProdutoInvalidoError = require("../errors/ProdutoInvalidoError");
 const produtoSchema = require("../schemas/produtoSchema");
 
-function validarProduto(request, response, next) {
-  const { nome } = request.body;
+const validarProduto = (request, response, next) => {
+  const result = produtoSchema.safeParse(request.body);
 
-  if (produtoSchema.nome.required && !nome) {
-    throw new ProdutoInvalidoError(
-      "O nome do produto é obrigatório"
-    );
+  if (!result.success) {
+    const errors = result.error.issues.map((e) => {
+      return {
+        campo: e.path[0],
+        message: e.message
+      };
+    });
+
+    return response.status(400).json({
+      error: errors
+    });
   }
 
-  if (typeof nome !== "string") {
-    throw new ProdutoInvalidoError(
-      "O nome do produto deve ser um texto"
-    );
-  }
-
+  request.body = result.data;
   next();
-}
+};
 
 module.exports = validarProduto;
