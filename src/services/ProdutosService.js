@@ -9,11 +9,7 @@ class ProdutoNaoEncontradoError extends Error {
 
 class ProdutoService {
   async create(produto) {
-    const novoProduto = await prisma.produtos.create({
-      data: produto
-    });
-
-    return novoProduto;
+    return await prisma.produtos.create({ data: produto });
   }
 
   async findMany(page = 1, pageSize = 10, orderBy = "id", order = "asc") {
@@ -36,25 +32,17 @@ class ProdutoService {
     });
 
     const total = await prisma.produtos.count();
-
     return { produtos, total, page: pagina, pageSize: tamanhoPagina };
   }
 
   async findById(id) {
-    const produto = await prisma.produtos.findUnique({
-      where: { id: Number(id) }
-    });
-
+    const produto = await prisma.produtos.findUnique({ where: { id: Number(id) } });
     if (!produto) throw new ProdutoNaoEncontradoError();
-
     return produto;
   }
 
   async update(id, dados) {
-    const produto = await prisma.produtos.findUnique({
-      where: { id: Number(id) }
-    });
-
+    const produto = await prisma.produtos.findUnique({ where: { id: Number(id) } });
     if (!produto) throw new ProdutoNaoEncontradoError();
 
     if (!dados.nome || typeof dados.nome !== "string") {
@@ -74,16 +62,15 @@ class ProdutoService {
         novoErro.statusCode = 409;
         throw novoErro;
       }
-
       throw error;
     }
   }
 
   async delete(id) {
-    const produto = await prisma.produtos.delete({
-      where: { id: Number(id) }
-    });
+    const produto = await prisma.produtos.findUnique({ where: { id: Number(id) } });
+    if (!produto) throw new ProdutoNaoEncontradoError();
 
+    await prisma.produtos.delete({ where: { id: Number(id) } });
     return produto;
   }
 }
