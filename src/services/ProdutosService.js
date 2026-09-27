@@ -1,5 +1,12 @@
 const prisma = require("../databases/prisma");
 
+class ProdutoNaoEncontradoError extends Error {
+  constructor() {
+    super("Produto não encontrado");
+    this.statusCode = 404;
+  }
+}
+
 class ProdutoService {
   async create(produto) {
     const novoProduto = await prisma.produtos.create({
@@ -48,6 +55,20 @@ class ProdutoService {
       page: pagina,
       pageSize: tamanhoPagina
     };
+  }
+
+  async findById(id) {
+    const produto = await prisma.produtos.findUnique({
+      where: {
+        id: Number(id)
+      }
+    });
+
+    if (!produto) {
+      throw new ProdutoNaoEncontradoError();
+    }
+
+    return produto;
   }
 
   async delete(id) {

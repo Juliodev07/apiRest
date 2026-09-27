@@ -37,6 +37,20 @@ class ProdutoController {
     }
   }
 
+  async findById(request, response) {
+    try {
+      const { id } = request.params;
+
+      const produto = await ProdutoService.findById(id);
+
+      return response.status(200).json({ produto });
+    } catch (e) {
+      return response.status(e.statusCode || 500).json({
+        message: e.message
+      });
+    }
+  }
+
   async delete(request, response) {
     try {
       const { id } = request.params;
